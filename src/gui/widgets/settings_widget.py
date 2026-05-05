@@ -69,10 +69,10 @@ class SettingsWidget(QWidget):
         
         # Max Tokens
         self.api_max_tokens_spin = QSpinBox()
-        self.api_max_tokens_spin.setRange(512, 8192)
+        self.api_max_tokens_spin.setRange(512, 16384)
         self.api_max_tokens_spin.setSingleStep(512)
-        self.api_max_tokens_spin.setValue(4096)
-        self.api_max_tokens_spin.setToolTip("最大输出token数，建议4096以上以确保完整输出所有数据")
+        self.api_max_tokens_spin.setValue(8000)
+        self.api_max_tokens_spin.setToolTip("最大输出token数，建议8000以上以确保完整输出所有71项数据")
         api_layout.addRow("Max Tokens：", self.api_max_tokens_spin)
         
         # 保存 API 配置按钮
@@ -207,7 +207,7 @@ class SettingsWidget(QWidget):
                     
                     # 从 payload_template 中获取 max_tokens
                     payload_template = extra_params.get('payload_template', {})
-                    max_tokens = payload_template.get('max_tokens', 4096)
+                    max_tokens = payload_template.get('max_tokens', 8000)
                     self.api_max_tokens_spin.setValue(max_tokens)
                     
                     # 更新状态
@@ -315,7 +315,7 @@ class SettingsWidget(QWidget):
                             "content": [
                                 {
                                     "type": "text",
-                                    "text": "识别图中COMBINER ISO TEMPERATURES(AZ,BZ,CZ,DZ,AB,CD,ABCD)和Z-Plane数据(A/B/C/D模块各8行)。\n\n⚠️关键:看表头!每个Z-Plane表格有4列:Current|Temp|ISO Gate|ISO Temp。只读取Current列(第1列,值约7-8)和ISO Temp列(第4列最右侧,值约40-60)。\n\n示例:Z-Plane A第1行: Current=7.2(读), Temp=48(跳过), Gate=-0.9(跳过), ISO Temp=40(读)\n\n返回JSON格式:\n{\"data\":[{\"item_name\":\"AZ\",\"value\":30.0,\"unit\":\"°C\"},{\"item_name\":\"Z-Plane A-Current-1\",\"value\":7.2,\"unit\":\"A\"},{\"item_name\":\"Z-Plane A-ISO Temp-1\",\"value\":40.0,\"unit\":\"°C\"}]}\n\n要求:纯JSON,不用markdown,value为数字,ISO Temp是最右侧独立列,按COMBINER->Z-Plane A->B->C->D顺序"
+                                    "text": "识别图中COMBINER ISO TEMPERATURES(AZ,BZ,CZ,DZ,AB,CD,ABCD共7项)和Z-Plane数据(A/B/C/D模块各8行×2列=64项)。\n\n⚠️必须输出全部71项数据！看表头!每个Z-Plane表格有4列:Current|Temp|ISO Gate|ISO Temp。只读取Current列(第1列,值约7-8)和ISO Temp列(第4列最右侧,值约40-60)。\n\n示例:Z-Plane A第1行: Current=7.2(读), Temp=48(跳过), Gate=-0.9(跳过), ISO Temp=40(读)\n\n返回JSON格式:\n{\"data\":[{\"item_name\":\"AZ\",\"value\":42.0,\"unit\":\"°C\"},{\"item_name\":\"BZ\",\"value\":50.0,\"unit\":\"°C\"},...全部7个COMBINER,{\"item_name\":\"Z-Plane A-Current-1\",\"value\":7.2,\"unit\":\"A\"},{\"item_name\":\"Z-Plane A-ISO Temp-1\",\"value\":40.0,\"unit\":\"°C\"},...全部64个Z-Plane]}\n\n要求:纯JSON,不用markdown,value为数字,ISO Temp是最右侧独立列,按COMBINER(7项)->Z-Plane A(16项)->B(16项)->C(16项)->D(16项)顺序,共71项"
                                 },
                                 {
                                     "type": "image_url",
